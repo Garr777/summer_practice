@@ -39,9 +39,22 @@ info "within $oldest_recent-$this_year:   $recent  (${share}%, required: >= ${RE
 # Citations and entries must agree both ways. A dangling [n] is the failure mode
 # renumbering introduces: it looks fine in Markdown and points at the wrong work
 # -- or at nothing -- in the exported report.
-mapfile -t cited < <(grep -rhoE '\[[0-9]+\]' --include='*.md' \
-  --exclude='5-istochniki.md' "$CATALOG_DIR" \
-  | tr -d '[]' | sort -n -u)
+#
+# Code is not prose: a listing containing `rec[name][0]` or `values[1]` is
+# indexing, not citing. Fenced blocks and inline spans are dropped before
+# counting, otherwise the appendix of source listings fails the build.
+strip_code() {
+  awk '
+    /^[[:space:]]*```/ { fence = !fence; next }
+    !fence { gsub(/`[^`]*`/, ""); print }
+  ' "$1"
+}
+
+mapfile -t cited < <(
+  find "$CATALOG_DIR" -name '*.md' ! -name '5-istochniki.md' -print0 \
+    | while IFS= read -r -d '' f; do strip_code "$f"; done \
+    | grep -oE '\[[0-9]+\]' | tr -d '[]' | sort -n -u
+)
 
 dangling=()
 for n in "${cited[@]}"; do

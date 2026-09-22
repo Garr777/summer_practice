@@ -1,0 +1,293 @@
+---
+title: Приложение Б. Ключевые фрагменты реализации
+order: 7
+description: Листинги программных компонентов, образующих задел по задачам 1–4 ВКР
+---
+
+Приложение содержит фрагменты программной реализации, составляющей задел по
+[задачам 1–4](4-proektnaya-chast/2-zadachi-vkr.md). Приведены не полные
+исходные тексты, а фрагменты, несущие методические решения, обсуждаемые в
+основной части отчёта. Язык реализации — Python 3.12.
+
+Комплекс состоит из двух компонентов:
+
+| Компонент | Назначение | Задачи ВКР |
+|---|---|---|
+| Конвейер подготовки данных и прогнозная модель | сбор и очистка телеметрии, обучение квантильной модели, оценка по показателям | 1, 2, 4 |
+| Имитационная модель пула исполнителей | воспроизведение потока задач под задаваемой конфигурацией | 3 |
+
+## Б.1. Устранение смещения выборки
+
+Срезы телеметрии снимаются периодически с перекрытием по времени, поэтому один
+и тот же прогон попадает в несколько последовательных срезов. Без
+дедупликации обучающая и контрольная выборки пересекаются, и оценка качества
+модели оказывается завышенной. Фрагмент реализует дедупликацию по
+идентификатору прогона с сохранением наиболее полной записи и упорядочение по
+фактическому времени запуска (см.
+[раздел 4.1.6](4-proektnaya-chast/1-tema-i-apparat.md)).
+
+```python
+def unique_runs(limit=None):
+    """Одна строка на одно реальное исполнение задачи."""
+    df = snapshots.runs_frame(limit=limit)
+    df = df[df["job_id"].notna()]
+
+    # job_id -- это одно исполнение; самый поздний срез, который его видел,
+    # содержит наиболее полные данные
+    df = df.sort_values("snapshot_ts").drop_duplicates(subset="job_id", keep="last")
+
+    df["started_at"] = pd.to_datetime(df["start_ts"], unit="s", utc=True)
+    df["duration_s"] = (df["end_ts"] - df["start_ts"]).clip(lower=0)
+    df["hour"] = df["started_at"].dt.hour
+    df["dow"] = df["started_at"].dt.dayofweek
+    # грубое семейство задач по префиксу имени -- для холодного старта
+    df["family"] = df["job"].str.split("_").str[:3].str.join("_")
+    return df.sort_values("start_ts").reset_index(drop=True)
+```
+
+Производные признаки `hour` и `dow` вводятся для учёта режимной
+неоднородности потока, признак `family` — для назначения запроса задаче, не
+имеющей собственной истории.
+
+## Б.2. Действующая эвристика как базовая линия
+
+Фрагмент воспроизводит статическую эвристику, применяемую в промышленной
+эксплуатации и описанную в
+[разделе 2.1.4](2-problematika/1-protivorechie.md). Она служит базовой линией,
+которую обязана превзойти прогнозная модель.
+
+```python
+CPU_STEP, CPU_MIN, CPU_MAX = 100, 100, 10_000
+MEM_STEP, MEM_MIN, MEM_MAX = 200, 200, 30_000
+
+
+def heuristic_table(df, pool):
+    """Один запрос (cpu_m, mem_mi) на имя задачи, по её собственным прогонам."""
+    table = {}
+    for name, g in df.groupby("job"):
+        cpu = g["cpu_hi"].quantile(pool.cpu_quantile) * pool.cpu_headroom
+        mem = g["mem_hi"].quantile(pool.mem_quantile) * pool.mem_headroom
+        table[name] = (
+            _clamp(_round_up(cpu, CPU_STEP), CPU_MIN, CPU_MAX),
+            _clamp(_round_near(mem, MEM_STEP), MEM_MIN, MEM_MAX),
+        )
+    return table
+```
+
+Асимметрия ресурсов ([раздел 2.3.4](2-problematika/3-karta-probelov.md))
+проявляется уже здесь: память округляется **вверх** и берётся по более
+высокому перцентилю, поскольку она невытесняема, тогда как процессор
+округляется до ближайшего шага и упаковывается плотнее.
+
+## Б.3. Признаки, известные до запуска задачи
+
+Ключевое требование к набору признаков — отсутствие утечки целевой переменной:
+прогон не должен использовать собственное значение потребления. Все
+статистики истории вычисляются со сдвигом на один прогон.
+
+```python
+PRIOR_STATS = ("prior_mean", "prior_max", "prior_last", "prior_std")
+FEATURES = [f"{col}_{s}" for col in ("cpu_hi", "mem_hi") for s in PRIOR_STATS] + \
+           ["prior_count", "is_builder", "hour", "dow"]
+
+
+def build_features(df):
+    df = df.sort_values(["job", "start_ts"]).copy()
+    grp = df.groupby("job")
+    for col in ("cpu_hi", "mem_hi"):
+        s = grp[col]
+        # .shift() -- прогон не видит собственного значения
+        df[f"{col}_prior_mean"] = s.transform(lambda x: x.shift().expanding().mean())
+        df[f"{col}_prior_max"] = s.transform(lambda x: x.shift().expanding().max())
+        df[f"{col}_prior_std"] = s.transform(lambda x: x.shift().expanding().std())
+        df[f"{col}_prior_last"] = s.shift()
+    df["prior_count"] = grp.cumcount()       # объём истории = мера доверия
+    df["is_builder"] = (df["pool"] == "linux-builder").astype(int)
+    return df.sort_values("start_ts").reset_index(drop=True)
+```
+
+Признак `prior_count` фиксирует объём накопленной истории и позволяет модели
+различать задачи с надёжной статистикой и задачи, запускаемые впервые.
+
+## Б.4. Квантильная модель и сравнение с базовой линией
+
+Фрагмент реализует обучение модели и её сопоставление с эвристикой и
+фактически заданными запросами на **отложенной во времени** выборке:
+разделение производится по порядку времени, а не случайно, поскольку случайное
+разделение допустило бы обучение на будущем относительно контроля.
+
+```python
+def evaluate(resource, target, quantile, cfg_col, headroom, floor):
+    df = build_features(dataset.unique_runs())
+    df = df[df[target].notna()]
+    split = int(len(df) * 0.7)
+    train, test = df.iloc[:split], df.iloc[split:]   # разделение по времени
+
+    model = HistGradientBoostingRegressor(loss="quantile", quantile=quantile,
+                                          max_iter=400, learning_rate=0.05)
+    model.fit(train[FEATURES], train[target])
+    model_req = np.maximum(model.predict(test[FEATURES]), floor)
+
+    per_job = train.groupby("job")[target].quantile(quantile) * headroom
+    pool_fb = train.groupby("pool")[target].quantile(quantile) * headroom
+    heuristic = test["job"].map(per_job).fillna(test["pool"].map(pool_fb)).clip(lower=floor)
+    ...
+
+
+if __name__ == "__main__":
+    evaluate("memory", "mem_hi", 0.95, "cfg_mem_mi", 1.10, 200)
+    evaluate("cpu",    "cpu_hi", 0.90, "cfg_cpu_m",  1.15, 100)
+```
+
+Два вызова в конце фрагмента и выражают формализацию асимметрии ресурсов: для
+памяти выбран квантиль 0,95, для процессора — 0,90. Квантиль здесь является
+явной и единственной «ручкой риска», чего не предоставляет ни одно из
+рассмотренных решений ([раздел 3.4.5](3-obzor-literatury/4-benchmarking.md)).
+
+## Б.5. Описание пула исполнителей
+
+Конфигурация пула вынесена в отдельный реестр, благодаря чему добавление
+нового пула не затрагивает ни имитационное ядро, ни модель, ни интерфейс.
+
+```python
+@dataclass(frozen=True)
+class Pool:
+    name: str            # соответствует столбцу `pool` в выборке
+    nodes: int
+    node_cpu_m: int      # доступный процессор на узел, миллиядра
+    node_mem_mi: int     # доступная память на узел, Ми
+    concurrency: int     # предел одновременно исполняемых задач
+    cpu_quantile: float = 0.90
+    mem_quantile: float = 0.95
+    cpu_headroom: float = 1.15
+    mem_headroom: float = 1.10
+```
+
+## Б.6. Модель числа ядер и растяжения длительности
+
+Фрагмент реализует специфический для конвейера непрерывной интеграции эффект,
+отсутствующий у обслуживаемых нагрузок и составляющий часть научной новизны
+([раздел 2.3.1](2-problematika/3-karta-probelov.md)): потребление процессора
+задачей ограничено не пределом контейнера, а числом ядер, заданным в её
+сценарии. Снижение числа ядер не только уменьшает потребление, но и
+**растягивает длительность**, изменяя нагрузку на пул во времени.
+
+```python
+def build_jobs(df, pool, policy_name, cores_mult=1.0, elasticity=0.7):
+    ...
+    duration = df["duration_s"].to_numpy(float).clip(min=1.0)
+    cpu_use = df["cpu_hi"].to_numpy(float)
+    cores_base = np.maximum(df["cpu_max"].to_numpy(float) / 1000.0, 0.001)
+
+    if cores_mult < 1.0:
+        capped = cores_base * cores_mult * 1000.0
+        cut = (capped > 0) & (capped < cpu_use)
+        # длительность растёт как (использовано / ограничено) ** elasticity;
+        # elasticity = 1 соответствует идеально распараллеливаемой работе
+        duration = np.where(cut,
+                            duration * (cpu_use / np.where(cut, capped, 1)) ** elasticity,
+                            duration)
+        cpu_use = np.where(cut, capped, cpu_use)
+```
+
+Существенно, что повышение числа ядер **не** ускоряет задачу сверх того, что
+она уже использовала: модель асимметрична по направлению изменения, что
+соответствует наблюдаемому поведению.
+
+## Б.7. Ядро имитационной модели
+
+Планировщик резервирует ёмкость **по запросу**, как это делает планировщик
+Kubernetes, тогда как фактическое потребление учитывается параллельно — именно
+это делает наблюдаемым переподписание ёмкости. Задача запускается, когда
+одновременно выполнены два условия: предел параллелизма имеет свободную
+позицию и существует узел с достаточным свободным запасом.
+
+```python
+def schedule(now):
+    """Один проход по очереди; возвращает True, если пул остаётся насыщенным."""
+    nonlocal running_count
+    keep = deque()
+    while queue:
+        qi = queue.popleft()
+        if running_count >= concurrency:       # предел параллелизма исчерпан
+            keep.append(qi); keep.extend(queue); queue.clear()
+            break
+        j = jobs[qi]
+        node, best_left = -1, None
+        for k in range(nodes):                 # размещение best-fit по процессору
+            if cpu_free[k] >= j["cpu_req"] and mem_free[k] >= j["mem_req"]:
+                left = cpu_free[k] - j["cpu_req"]
+                if best_left is None or left < best_left:
+                    best_left, node = left, k
+        if node < 0:                           # голова очереди не помещается:
+            keep.append(qi); keep.extend(queue)  # пул заполнен, ждём завершения
+            queue.clear()
+            break
+        cpu_free[node] -= j["cpu_req"]         # резерв -- ПО ЗАПРОСУ
+        mem_free[node] -= j["mem_req"]
+        heapq.heappush(running, (now + j["duration"], node,
+                                 j["cpu_req"], j["mem_req"], qi))
+        running_count += 1
+        j["pending_s"] = round(now - j["arrival"])
+```
+
+Главный цикл продвигает модельное время к ближайшему событию — поступлению
+задачи либо её завершению:
+
+```python
+while i < n or running:
+    next_arrival = jobs[i]["arrival"] if i < n else float("inf")
+    next_done = running[0][0] if running else float("inf")
+    now = min(next_arrival, next_done)
+    ...
+```
+
+Ядро реализовано на чистом Python без внешних зависимостей и **детерминировано**:
+одинаковый вход даёт одинаковый выход. Это требование существенно для
+исследовательского применения — сравнение конфигураций должно быть
+воспроизводимым.
+
+## Б.8. Показатели оценки конфигурации
+
+Фрагмент вычисляет показатели, по которым сопоставляются конфигурации
+([раздел 4.1.6](4-proektnaya-chast/1-tema-i-apparat.md)).
+
+```python
+def _kpis(jobs, series, nodes, node_cpu_m, node_mem_mi):
+    pend = [j["pending_s"] for j in jobs]
+    over_mem = sum(1 for j in jobs if j["mem_use"] > j["mem_req"])
+    over_cpu = sum(1 for j in jobs if j["cpu_use"] > j["cpu_req"])
+    return {
+        "pending_p50": _pct(pend, 0.50),
+        "pending_p90": _pct(pend, 0.90),
+        "pending_p99": _pct(pend, 0.99),
+        "peak_running": max(series["running"]),
+        "under_mem_pct": round(100 * over_mem / len(jobs), 1),   # показатель надёжности
+        "cpu_over_pct": round(100 * over_cpu / len(jobs), 1),    # информационный
+        "makespan_s": round(t1 - t0),
+    }
+```
+
+Разделение показателей на целевые и информационные принципиально:
+`under_mem_pct` подлежит минимизации, поскольку превышение запроса по памяти
+ведёт к вытеснению контейнера, тогда как `cpu_over_pct` приводится для
+контекста — процессор вытесняем, и использование простаивающих ядер является
+штатным поведением.
+
+## Б.9. Оценка объёма реализации
+
+| Компонент | Модуль | Строк кода |
+|---|---|---|
+| Имитационное ядро | `engine.py` | 191 |
+| Сценарий и модель ядер | `scenario.py` | 62 |
+| Политики назначения запросов | `policy.py` | 57 |
+| Реестр пулов | `pools.py` | 46 |
+| Служба и интерфейс | `serve.py`, `static/` | 105 + интерфейс |
+| Загрузка телеметрии | `snapshots.py` | 137 |
+| Подготовка выборки | `dataset.py` | 45 |
+| Обучение модели | `train.py` | 71 |
+| Показатели базовой линии | `baseline.py` | 55 |
+
+Приведённые объёмы характеризуют задел, а не итоговую трудоёмкость: основная
+часть работы по [задачам 3 и 5](4-proektnaya-chast/2-zadachi-vkr.md) —
+верификация имитационной модели и факторный эксперимент — предстоит.
