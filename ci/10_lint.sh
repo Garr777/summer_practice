@@ -34,6 +34,14 @@ for f in "${articles[@]}"; do
 
   # 3. tabs break markdown list nesting in the DOCX renderer
   grep -qP '^\t' "$f" && report_error "$rel: leading tab (use spaces)"
+
+  # 4. gramax renders the front-matter title as the article's heading, so a
+  #    body H1 repeating it prints the section title twice in the export --
+  #    invisible in Markdown, obvious only in the handed-in document
+  title="$(sed -n 's/^title: *//p' <<<"$front" | head -n 1 | tr -d '"'"'"'')"
+  body_h1="$(awk 'NR>1 && /^---$/{f=1; next} f && NF {print; exit}' "$f")"
+  [[ -n "$title" && "$body_h1" == "# $title" ]] \
+    && report_error "$rel: body H1 repeats the front-matter title"
 done
 
 # 4. items at one level must have distinct `order` -- otherwise the sequence is
