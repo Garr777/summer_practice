@@ -1,12 +1,15 @@
 # Front-end for ci/. Every target is one pipeline stage, so what runs locally
 # and what a runner would run are the same scripts.
-.PHONY: all lint check sources html docx pdf clean serve stages
+.PHONY: all lint figures check sources html docx pdf clean serve stages
 
 all:      ## run the full pipeline (lint -> check -> sources -> html -> docx -> pdf)
 	@ci/pipeline.sh
 
 lint:     ## structural lint of the catalog
 	@ci/pipeline.sh lint
+
+figures:  ## rasterise report/images/*.svg to the PNGs the export ships
+	@ci/pipeline.sh figures
 
 check:    ## gramax catalog validation
 	@ci/pipeline.sh check

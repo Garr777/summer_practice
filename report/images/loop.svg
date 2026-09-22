@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 820" width="1280" height="820" font-family="'DejaVu Sans', 'Liberation Sans', Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="aAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#b45309"/>
+    </marker>
+    <marker id="aMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="1280" height="820" fill="#ffffff"/>
+
+  <!-- ===== внешние источники изменения ===== -->
+  <rect x="60" y="50" width="340" height="100" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="230" y="83" text-anchor="middle" font-size="18" font-weight="600" fill="#0f172a">Изменение кодовой базы</text>
+  <text x="230" y="108" text-anchor="middle" font-size="14" fill="#475569">дефекты · тесты · функции</text>
+  <text x="230" y="128" text-anchor="middle" font-size="14" fill="#475569">флаги · параллельные режимы</text>
+
+  <rect x="880" y="50" width="340" height="100" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="1050" y="83" text-anchor="middle" font-size="18" font-weight="600" fill="#0f172a">Изменение инфраструктуры</text>
+  <text x="1050" y="108" text-anchor="middle" font-size="14" fill="#475569">узлы · ёмкость</text>
+  <text x="1050" y="128" text-anchor="middle" font-size="14" fill="#475569">предел параллелизма</text>
+
+  <path d="M230 150 L230 272" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#aMuted)"/>
+  <text x="244" y="200" font-size="14" fill="#64748b">меняет наблюдаемое</text>
+  <text x="244" y="220" font-size="14" fill="#64748b">потребление</text>
+
+  <path d="M1050 150 L1050 280" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#aMuted)"/>
+  <text x="1064" y="200" font-size="14" fill="#64748b">меняет ограничение,</text>
+  <text x="1064" y="220" font-size="14" fill="#64748b">а не прогноз</text>
+
+  <!-- ===== ряд 1: стадии 1-3 ===== -->
+  <rect x="60" y="280" width="340" height="120" rx="10" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <circle cx="92" cy="311" r="15" fill="#334155"/>
+  <text x="92" y="317" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">1</text>
+  <text x="118" y="317" font-size="19" font-weight="600" fill="#0f172a">Сбор телеметрии</text>
+  <text x="84" y="348" font-size="14.5" fill="#475569">непрерывно, в хранилище</text>
+  <text x="84" y="370" font-size="14.5" fill="#475569">без удаления: потребление</text>
+  <text x="84" y="392" font-size="14.5" fill="#475569">и действующая конфигурация</text>
+
+  <rect x="470" y="280" width="340" height="120" rx="10" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <circle cx="502" cy="311" r="15" fill="#334155"/>
+  <text x="502" y="317" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">2</text>
+  <text x="528" y="317" font-size="19" font-weight="600" fill="#0f172a">Переобучение</text>
+  <text x="494" y="348" font-size="14.5" fill="#475569">по расписанию и по триггеру</text>
+  <text x="494" y="370" font-size="14.5" fill="#475569">дрейфа; квантиль раздельно</text>
+  <text x="494" y="392" font-size="14.5" fill="#475569">для памяти и процессора</text>
+
+  <rect x="880" y="280" width="340" height="120" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="3"/>
+  <circle cx="912" cy="311" r="15" fill="#b45309"/>
+  <text x="912" y="317" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">3</text>
+  <text x="936" y="309" font-size="17" font-weight="700" fill="#7c2d12">Приёмочная проверка</text>
+  <text x="936" y="330" font-size="17" font-weight="700" fill="#7c2d12">на имитационной модели</text>
+  <text x="904" y="362" font-size="14.5" fill="#7c2d12">критерий — системное</text>
+  <text x="904" y="383" font-size="14.5" fill="#7c2d12">последствие, а не метрика модели</text>
+
+  <!-- ===== ряд 2: стадии 4-5 (ход справа налево) ===== -->
+  <rect x="880" y="560" width="340" height="120" rx="10" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <circle cx="912" cy="591" r="15" fill="#334155"/>
+  <text x="912" y="597" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">4</text>
+  <text x="938" y="597" font-size="19" font-weight="600" fill="#0f172a">Применение</text>
+  <text x="904" y="628" font-size="14.5" fill="#475569">теневой режим · нижняя граница</text>
+  <text x="904" y="650" font-size="14.5" fill="#475569">значимая дельта · поэтапно</text>
+  <text x="904" y="672" font-size="14.5" fill="#475569">откат через Git</text>
+
+  <rect x="470" y="560" width="340" height="120" rx="10" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <circle cx="502" cy="591" r="15" fill="#334155"/>
+  <text x="502" y="597" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">5</text>
+  <text x="528" y="597" font-size="19" font-weight="600" fill="#0f172a">Наблюдение результата</text>
+  <text x="494" y="628" font-size="14.5" fill="#475569">факт против предсказанного:</text>
+  <text x="494" y="650" font-size="14.5" fill="#475569">вытеснения, время ожидания,</text>
+  <text x="494" y="672" font-size="14.5" fill="#475569">утилизация</text>
+
+  <!-- ===== связи ===== -->
+  <path d="M400 340 L462 340" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+  <path d="M810 340 L872 340" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+
+  <!-- 3 -> 4 : допущено -->
+  <path d="M1050 400 L1050 552" stroke="#b45309" stroke-width="2.5" fill="none" marker-end="url(#aAccent)"/>
+  <text x="1066" y="482" font-size="14" font-weight="600" fill="#b45309">допущено</text>
+
+  <!-- 3 -> 2 : отклонено -->
+  <path d="M950 400 L950 470 L700 470 L700 408" stroke="#b45309" stroke-width="2.5" fill="none" stroke-dasharray="7 5" marker-end="url(#aAccent)"/>
+  <text x="825" y="462" text-anchor="middle" font-size="14" font-weight="600" fill="#b45309">отклонено</text>
+
+  <!-- 4 -> 5 -->
+  <path d="M880 620 L822 620" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+
+  <!-- 5 -> 2 : триггер дрейфа -->
+  <path d="M560 560 L560 408" stroke="#334155" stroke-width="2.5" fill="none" stroke-dasharray="7 5" marker-end="url(#a)"/>
+  <text x="574" y="500" font-size="14" font-weight="600" fill="#334155">триггер дрейфа</text>
+
+  <!-- 5 -> 1 : замыкание контура -->
+  <path d="M470 620 L230 620 L230 408" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+  <text x="244" y="500" font-size="14" font-weight="600" fill="#334155">замыкание контура</text>
+
+  <!-- сноска -->
+  <text x="60" y="754" font-size="14" fill="#64748b">Сплошная линия — основной ход контура, пунктир — возвратные связи. Выделенная стадия 3 составляет методологическое</text>
+  <text x="60" y="776" font-size="14" fill="#64748b">предложение работы. Изменение инфраструктуры направляется в неё напрямую: оно требует повторной приёмки, но не переобучения.</text>
+</svg>

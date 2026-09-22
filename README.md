@@ -41,6 +41,7 @@ Individual stages, in the order the pipeline runs them:
 
 ```bash
 make lint       # front matter, duplicate ordering, leftover TODOs
+make figures    # rasterise diagrams: report/images/*.svg -> *.png
 make check      # gramax catalog validation (links, images, unsupported elements)
 make sources    # bibliography gate: >= 30 entries, recency, citation coverage
 make html       # static site        -> artifacts/site/
@@ -70,6 +71,11 @@ Two of the stages exist purely to automate rules from the assignment brief:
 - **`sources`** — the brief requires at least 30 sources from the last 3–5 years,
   each actually cited. Re-counting that by hand on every revision is the
   monotonous work this approach is meant to remove.
+- **`figures`** — diagrams are authored as SVG so they stay text, but gramax
+  embeds a referenced `.svg` into the DOCX as raw SVG bytes under a `.png` part
+  name, which Word cannot draw. Articles therefore reference the PNG, this
+  stage regenerates it, and `export:docx` verifies every embedded image's magic
+  bytes match its declared extension.
 
 ## Editing
 
