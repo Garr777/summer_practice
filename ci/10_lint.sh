@@ -36,14 +36,34 @@ for f in "${articles[@]}"; do
   grep -qP '^\t' "$f" && report_error "$rel: leading tab (use spaces)"
 done
 
-# 4. sibling articles must have distinct `order` -- otherwise section sequence
-#    is undefined, and the printed report comes out shuffled
+# 4. items at one level must have distinct `order` -- otherwise the sequence is
+#    undefined and the printed report comes out shuffled. A level's items are
+#    the plain articles in the directory plus each subdirectory, which is
+#    represented by its own _index.md: a section's order belongs to the level
+#    above it, not beside its own children.
 while IFS= read -r dir; do
-  dupes="$(grep -h '^order:' "$dir"/*.md 2>/dev/null \
-    | awk '{print $2}' | sort | uniq -d || true)"
+  orders=()
+  for f in "$dir"/*.md; do
+    [[ -e "$f" && "$(basename "$f")" != "_index.md" ]] || continue
+    orders+=("$(awk -F': *' '/^order:/{print $2; exit}' "$f")")
+  done
+  for sub in "$dir"/*/; do
+    [[ -f "$sub/_index.md" ]] || continue
+    orders+=("$(awk -F': *' '/^order:/{print $2; exit}' "$sub/_index.md")")
+  done
+  (( ${#orders[@]} > 0 )) || continue
+  dupes="$(printf '%s\n' "${orders[@]}" | sort | uniq -d)"
   [[ -z "$dupes" ]] \
     || report_error "${dir#"$ROOT_DIR"/}: duplicate order value(s): $(tr '\n' ' ' <<<"$dupes")"
 done < <(find "$CATALOG_DIR" -type d | sort)
+
+# 5. {{PLACEHOLDER}} tokens are reported but do not fail the build: the title
+#    page is filled in from the department's form, and the pipeline has to stay
+#    runnable before that happens.
+mapfile -t placeholders < <(grep -rhoE '\{\{[A-ZА-Я_]+\}\}' "$CATALOG_DIR" | sort -u)
+if (( ${#placeholders[@]} > 0 )); then
+  warn "unfilled placeholders: ${placeholders[*]}"
+fi
 
 info "articles checked: ${#articles[@]}"
 [[ $errors -eq 0 ]] || fail "$errors structural error(s)"
