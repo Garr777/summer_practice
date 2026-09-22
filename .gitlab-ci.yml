@@ -1,0 +1,70 @@
+# Mirror of ci/ for a GitLab runner.
+#
+# Deliberately thin: every job calls the same script `make` calls locally, so
+# there is exactly one implementation of the build. Adding a stage means adding
+# a script in ci/ and a four-line job here -- never build logic in YAML.
+
+default:
+  image: node:20-bookworm-slim
+  tags: [docker-linux-amd64]
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends make ca-certificates
+  cache:
+    key: gramax-cli
+    paths: [.npm/]
+
+variables:
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
+  GIT_DEPTH: "0"
+
+stages: [validate, build, export]
+
+lint:
+  stage: validate
+  script: [ci/pipeline.sh lint]
+
+check:
+  stage: validate
+  script: [ci/pipeline.sh check]
+  artifacts:
+    when: always
+    paths: [ci/logs/]
+    expire_in: 1 week
+
+sources:
+  stage: validate
+  script: [ci/pipeline.sh sources]
+
+html:
+  stage: build
+  script: [ci/pipeline.sh build:html]
+  artifacts:
+    paths: [artifacts/site/]
+    expire_in: 1 month
+
+docx:
+  stage: export
+  script: [ci/pipeline.sh export:docx]
+  artifacts:
+    name: "report-$CI_COMMIT_SHORT_SHA"
+    paths: [artifacts/report.docx]
+    expire_in: 1 year
+
+pdf:
+  stage: export
+  script: [ci/pipeline.sh export:pdf]
+  artifacts:
+    name: "report-$CI_COMMIT_SHORT_SHA"
+    paths: [artifacts/report.pdf]
+    expire_in: 1 year
+
+# Publish the built site for whoever is reviewing the draft.
+pages:
+  stage: export
+  script:
+    - ci/pipeline.sh build:html
+    - mv artifacts/site public
+  artifacts:
+    paths: [public]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
