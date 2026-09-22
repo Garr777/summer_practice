@@ -67,6 +67,12 @@ QUERIES = {
         "carbon aware scheduling datacenter",
         "infrastructure as code technical debt quantitative",
     ],
+    "K7 mlops and model maintenance": [
+        "Machine Learning Operations MLOps overview definition architecture",
+        "MLOps continuous delivery machine learning systems practices",
+        "concept drift detection model retraining production",
+        "continuous training machine learning pipeline automation maturity",
+    ],
 }
 
 ARXIV_QUERIES = [
