@@ -54,3 +54,4 @@ HTML-версия формируются автоматически как ар�
 4. [Проектная часть ВКР](4-proektnaya-chast/_index.md)
 5. [Список источников](5-istochniki.md)
 6. [Приложение А. Реализация Documentation-as-Code](6-prilozhenie-docs-as-code.md)
+7. [Приложение Б. Ключевые фрагменты реализации](7-prilozhenie-listingi.md)
