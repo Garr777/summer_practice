@@ -1,10 +1,10 @@
 ---
 title: 5. Список источников
 order: 5
-description: Библиографический перечень из 41 источника, сгруппированный по тематическим кластерам
+description: Библиографический перечень из 46 источников, сгруппированный по тематическим кластерам
 ---
 
-Перечень содержит **41 позицию**, из них 37 — научные публикации, 2 —
+Перечень содержит **46 позиций**, из них 42 — научные публикации, 2 —
 нормативные правовые акты Российской Федерации, 1 — отраслевой аналитический
 отчёт, 1 — документация программного продукта. Публикации 2021–2026 гг.
 составляют 100 % научной части перечня, что соответствует требованию отбора
@@ -69,9 +69,17 @@ description: Библиографический перечень из 41 ист�
 36. Tornhill A., Borg M. Code Red // Proceedings of the International Conference on Technical Debt (TechDebt). — 2022. — DOI: 10.1145/3524843.3528091.
 37. Бажанов А. Э., Воробьева Е. Г., Ларин Д. В., Карташов Д. А. Моделирование масштабируемых микросервисных систем в условиях контейнерной виртуализации с использованием Kubernetes и Service Mesh (на примере Istio) // Программные системы и вычислительные методы. — 2025. — № 4. — DOI: 10.7256/2454-0714.2025.4.76208.
 
-## К7. Нормативные документы и отраслевые отчёты
+## К7. MLOps и сопровождение моделей в эксплуатации
 
-38. Национальный проект «Экономика данных и цифровая трансформация государства»: паспорт утверждён протоколом заочного голосования членов президиума Совета при Президенте Российской Федерации по стратегическому развитию и национальным проектам от 20.12.2024 № 12пр. Период реализации: 2025–2030 гг.
-39. О мерах по обеспечению технологической независимости и безопасности критической информационной инфраструктуры Российской Федерации: Указ Президента Российской Федерации от 30.03.2022 № 166 (с изменениями).
-40. Kubernetes Benchmark Report 2024 / Fairwinds. — Анализ свыше 330 000 рабочих нагрузок в сотнях организаций. — 2024. — URL: https://www.fairwinds.com/news/2024-kubernetes-benchmark-report.
-41. Gramax: платформа документации как кода с поддержкой Git и экспорта в DOCX/PDF по шаблону. — 2026. — URL: https://gram.ax/ru.
+38. Kreuzberger D., Kühl N., Hirschl S. Machine Learning Operations (MLOps): Overview, Definition, and Architecture // IEEE Access. — 2023. — DOI: 10.1109/access.2023.3262138.
+39. Garg S., Pundir P., Rathee G. и др. On Continuous Integration / Continuous Delivery for Automated Deployment of Machine Learning Models using MLOps // 2021 IEEE Fourth International Conference on Artificial Intelligence and Knowledge Engineering (AIKE). — 2021. — DOI: 10.1109/aike52691.2021.00010.
+40. Srinivasan V., R J., R A. и др. Model Drift Detection and Automated Retraining in Production ML System // 2025 6th International Conference on Smart Electronics and Communication (ICOSEC). — 2025. — DOI: 10.1109/icosec67334.2025.11459598.
+41. Bagui S., Khan M., Valmyr C. и др. Model Retraining upon Concept Drift Detection in Network Traffic Big Data // Future Internet. — 2025. — DOI: 10.3390/fi17080328.
+42. Holt J. When to retrain? Assessing production ML model performance using uncertainty, out-of-distribution detection, and concept drift detection // Disruptive Technologies in Information Sciences VI. — 2022. — DOI: 10.1117/12.2618321.
+
+## К8. Нормативные документы и отраслевые отчёты
+
+43. Национальный проект «Экономика данных и цифровая трансформация государства»: паспорт утверждён протоколом заочного голосования членов президиума Совета при Президенте Российской Федерации по стратегическому развитию и национальным проектам от 20.12.2024 № 12пр. Период реализации: 2025–2030 гг.
+44. О мерах по обеспечению технологической независимости и безопасности критической информационной инфраструктуры Российской Федерации: Указ Президента Российской Федерации от 30.03.2022 № 166 (с изменениями).
+45. Kubernetes Benchmark Report 2024 / Fairwinds. — Анализ свыше 330 000 рабочих нагрузок в сотнях организаций. — 2024. — URL: https://www.fairwinds.com/news/2024-kubernetes-benchmark-report.
+46. Gramax: платформа документации как кода с поддержкой Git и экспорта в DOCX/PDF по шаблону. — 2026. — URL: https://gram.ax/ru.
