@@ -1,0 +1,60 @@
+# Sources included after screening, in bibliography order (report section 5).
+# One identifier per line: a DOI, or an arXiv id. Text after # is a comment.
+#
+# Entries marked [snowball] were not returned by the query set in search.py but
+# were reached from a retrieved record (backward/forward citation, or a targeted
+# verification search for a specific work). They are listed here so the review's
+# provenance stays complete.
+#
+# The four non-scientific sources of cluster K7 (legal acts, an industry report,
+# product documentation) carry no DOI and are not tracked here; they appear only
+# in the bibliography.
+
+# --- K1. Forecasting resource consumption ---
+10.1016/j.jss.2023.111750              # 1
+10.1038/s41598-026-40777-z             # 2
+10.1109/iccke60553.2023.10326297       # 3
+10.1109/ines67149.2025.11078195        # 4
+10.3390/app11198995                    # 5  [snowball] cited from a retrieved survey
+2209.02551                             # 6
+2604.12673                             # 7
+
+# --- K2. Resource management and autoscaling ---
+10.3390/electronics13071242            # 8
+10.1016/j.future.2024.04.047           # 9
+10.1109/iscc61673.2024.10733692        # 10
+2112.14845                             # 11 [snowball] targeted search on collective autoscaling
+10.1002/spe.3271                       # 12
+2105.14845                             # 13
+
+# --- K3. Scheduling and placement ---
+10.3390/computers15070458              # 14
+10.1109/smartcloud58862.2023.00035     # 15
+10.1109/globecom46510.2021.9685328     # 16
+2609.22142                             # 17
+10.1007/s10586-024-04763-2             # 18
+10.1007/s10586-020-03210-2             # 19
+10.1109/ciot53061.2022.9766522         # 20
+
+# --- K4. Simulation and trace analysis ---
+10.1002/spe.3413                       # 21
+10.1002/spe.3290                       # 22
+2607.09318                             # 23
+2205.11582                             # 24
+2312.10127                             # 25
+10.32362/2500-316X-2026-14-4-21-35     # 26 [snowball] targeted search, RU venue
+
+# --- K5. Empirical studies of CI pipelines ---
+10.1007/s10664-024-10555-4             # 27
+2308.13129                             # 28
+10.1109/icsme58846.2023.00032          # 29
+10.1007/s10515-021-00319-5             # 30
+10.1016/j.jss.2026.112791              # 31
+10.1007/s10664-026-10874-8             # 32
+2111.03382                             # 33
+
+# --- K6. Economics, sustainability, quality ---
+2501.14753                             # 34
+2201.10036                             # 35
+10.1145/3524843.3528091                # 36
+10.7256/2454-0714.2025.4.76208         # 37 [snowball] targeted search, RU venue
