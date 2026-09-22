@@ -23,4 +23,40 @@ gramax "${args[@]}" || fail "DOCX export failed"
 [[ -f "$out.docx" ]] || fail "expected $out.docx, not produced"
 info "docx: ${out#"$ROOT_DIR"/}.docx  ($(du -h "$out.docx" | cut -f1))"
 
+# Every embedded image must actually be the format its part name claims. An
+# .svg referenced from an article is embedded as raw SVG bytes under a .png
+# part name: the document builds, the pipeline is green, and the figure is
+# blank when it is opened. Checking magic bytes is what catches it.
+python3 - "$out.docx" <<'PY' || fail "DOCX contains malformed image parts"
+import sys, zipfile
+
+MAGIC = {
+    "png":  [b"\x89PNG\r\n\x1a\n"],
+    "jpg":  [b"\xff\xd8\xff"],
+    "jpeg": [b"\xff\xd8\xff"],
+    "gif":  [b"GIF87a", b"GIF89a"],
+    "bmp":  [b"BM"],
+    "emf":  [b"\x01\x00\x00\x00"],
+    "wmf":  [b"\xd7\xcd\xc6\x9a", b"\x01\x00\x09\x00"],
+}
+
+bad = []
+with zipfile.ZipFile(sys.argv[1]) as z:
+    parts = [n for n in z.namelist() if n.startswith("word/media/") and not n.endswith("/")]
+    for name in parts:
+        ext = name.rsplit(".", 1)[-1].lower()
+        head = z.read(name)[:16]
+        expected = MAGIC.get(ext)
+        if expected is None:
+            print(f"    note: {name} -- unchecked extension .{ext}")
+        elif not any(head.startswith(m) for m in expected):
+            looks = "SVG" if head.lstrip()[:4] == b"<svg" else head[:8].hex()
+            bad.append(f"{name} declares .{ext} but contains {looks}")
+
+print(f"    embedded images: {len(parts)} checked, {len(bad)} malformed")
+for b in bad:
+    print(f"    malformed: {b}", file=sys.stderr)
+sys.exit(1 if bad else 0)
+PY
+
 stage_end
