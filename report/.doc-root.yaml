@@ -1,0 +1,16 @@
+code: PRACTICE
+title: Отчёт по летней практике
+description: >-
+  Научно-исследовательский фундамент магистерской ВКР: обоснование ресурсных
+  запросов CI-задач на основе ML-прогноза потребления и имитационного
+  моделирования кластера.
+language: ru
+style: blue
+properties:
+  - name: status
+    type: Enum
+    style: blue
+    values:
+      - draft
+      - review
+      - final

@@ -36,15 +36,27 @@ share=0
 info "entries:          $total  (required: >= $MIN_SOURCES)"
 info "within $oldest_recent-$this_year:   $recent  (${share}%, required: >= ${RECENT_SHARE}%)"
 
-# Every entry must be cited somewhere in the body as [n].
+# Citations and entries must agree both ways. A dangling [n] is the failure mode
+# renumbering introduces: it looks fine in Markdown and points at the wrong work
+# -- or at nothing -- in the exported report.
+mapfile -t cited < <(grep -rhoE '\[[0-9]+\]' --include='*.md' \
+  --exclude='5-istochniki.md' "$CATALOG_DIR" \
+  | tr -d '[]' | sort -n -u)
+
+dangling=()
+for n in "${cited[@]}"; do
+  (( n >= 1 && n <= total )) || dangling+=("$n")
+done
+
 uncited=()
 for n in $(seq 1 "$total"); do
-  grep -rqF "[$n]" --include='*.md' --exclude='5-istochniki.md' "$CATALOG_DIR" \
-    || uncited+=("$n")
+  printf '%s\n' "${cited[@]}" | grep -qx "$n" || uncited+=("$n")
 done
-if (( ${#uncited[@]} > 0 )); then
-  warn "never cited in the text: [${uncited[*]}]"
-fi
+
+info "cited in text:    ${#cited[@]} distinct"
+(( ${#uncited[@]} == 0 )) || warn "listed but never cited: [${uncited[*]}]"
+(( ${#dangling[@]} == 0 )) \
+  || fail "citations point past the bibliography: [${dangling[*]}] (only $total entries)"
 
 (( total >= MIN_SOURCES ))       || fail "only $total sources, need $MIN_SOURCES"
 (( share >= RECENT_SHARE ))      || fail "only ${share}% of sources are from the last $WINDOW_YEARS years"

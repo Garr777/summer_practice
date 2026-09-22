@@ -11,7 +11,7 @@ stage_begin "build:html"
 out="$ARTIFACTS_DIR/site"
 rm -rf "$out"
 
-gramax build -s "$ROOT_DIR" -d "$out" --skip-check \
+gramax build -s "$CATALOG_DIR" -d "$out" --skip-check \
   || fail "static site build failed"
 
 [[ -f "$out/index.html" ]] || fail "build produced no index.html"

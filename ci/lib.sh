@@ -51,6 +51,8 @@ fail()  { printf '%s\n' "${C_RED}${C_BOLD}    FAIL${C_RESET} $*" >&2; exit 1; }
 gramax() {
   local log="$LOG_DIR/${STAGE_NAME//:/-}.log" rc=0
   npx -y "gramax-cli@${GRAMAX_CLI_VERSION}" "$@" >"$log" 2>&1 || rc=$?
-  sed 's/{"name":.*$//' "$log" | grep -v '^[[:space:]]*$' | sed 's/^/    /' || true
+  # progress bars redraw with \r -- keep only what each line finally said
+  sed -e 's/.*\r//' -e 's/{"name":.*$//' "$log" \
+    | grep -v '^[[:space:]]*$' | sed 's/^/    /' || true
   return $rc
 }
