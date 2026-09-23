@@ -51,10 +51,10 @@ HTML-версия формируются автоматически как ар�
 
 ## Содержание
 
-1. [Введение](1-vvedenie.md)
+1. [Постановка задачи и методология исследования](1-vvedenie.md)
 2. [Проблематика и обоснование актуальности](2-problematika/_index.md)
 3. [Обзор научной литературы](3-obzor-literatury/_index.md)
 4. [Проектная часть ВКР](4-proektnaya-chast/_index.md)
-5. [Список источников](5-istochniki.md)
+5. [Список использованных источников](5-istochniki.md)
 6. [Приложение А. Реализация Documentation-as-Code](6-prilozhenie-docs-as-code.md)
 7. [Приложение Б. Ключевые фрагменты реализации](7-prilozhenie-listingi.md)

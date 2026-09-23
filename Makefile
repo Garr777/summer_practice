@@ -1,6 +1,6 @@
 # Front-end for ci/. Every target is one pipeline stage, so what runs locally
 # and what a runner would run are the same scripts.
-.PHONY: all lint figures check sources html docx pdf clean serve stages
+.PHONY: all lint figures check sources html docx pdf kfu clean serve stages
 
 all:      ## run the full pipeline (lint -> check -> sources -> html -> docx -> pdf)
 	@ci/pipeline.sh
@@ -25,6 +25,9 @@ docx:     ## export the deliverable -> artifacts/report.docx
 
 pdf:      ## export the reading copy -> artifacts/report.pdf
 	@ci/pipeline.sh export:pdf
+
+kfu:      ## fill the department's form -> artifacts/Отчет.docx
+	@ci/pipeline.sh export:kfu
 
 serve:    ## preview the built site on :8080
 	@python3 -m http.server 8080 --directory artifacts/site
