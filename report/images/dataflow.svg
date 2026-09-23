@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 880" width="1360" height="880" font-family="'DejaVu Sans', 'Liberation Sans', Arial, sans-serif">
+  <defs>
+    <marker id="d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="dAcc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#b45309"/>
+    </marker>
+  </defs>
+
+  <rect width="1360" height="880" fill="#ffffff"/>
+
+  <!-- ===== ряд 1: сбор и подготовка выборки ===== -->
+  <rect x="40" y="60" width="290" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="60" y="90" font-size="17" font-weight="600" fill="#0f172a">Телеметрия кластера</text>
+  <text x="60" y="117" font-size="13.5" fill="#475569">cAdvisor · kube-state-metrics</text>
+  <text x="60" y="138" font-size="13.5" fill="#475569">потребление, ожидание,</text>
+  <text x="60" y="159" font-size="13.5" fill="#475569">действующие requests</text>
+
+  <rect x="360" y="60" width="290" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="380" y="90" font-size="17" font-weight="600" fill="#0f172a">Объектное хранилище</text>
+  <text x="380" y="117" font-size="13.5" fill="#475569">срезы по расписанию,</text>
+  <text x="380" y="138" font-size="13.5" fill="#475569">накопление без удаления —</text>
+  <text x="380" y="159" font-size="13.5" fill="#475569">глубина истории растёт</text>
+
+  <rect x="680" y="60" width="290" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="700" y="90" font-size="17" font-weight="600" fill="#0f172a">snapshots.py</text>
+  <text x="700" y="117" font-size="13.5" fill="#475569">загрузка срезов,</text>
+  <text x="700" y="138" font-size="13.5" fill="#475569">локальный кэш —</text>
+  <text x="700" y="159" font-size="13.5" fill="#475569">работа без сети</text>
+
+  <rect x="1000" y="60" width="290" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="1020" y="90" font-size="17" font-weight="600" fill="#0f172a">dataset.py</text>
+  <text x="1020" y="117" font-size="13.5" font-weight="600" fill="#b45309">дедупликация по job_id</text>
+  <text x="1020" y="138" font-size="13.5" fill="#475569">временные признаки,</text>
+  <text x="1020" y="159" font-size="13.5" fill="#475569">семейство задач</text>
+
+  <path d="M330 115 L352 115" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <path d="M650 115 L672 115" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <path d="M970 115 L992 115" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+
+  <!-- ===== разветвление на политики ===== -->
+  <path d="M1145 170 L1145 225 L310 225" stroke="#334155" stroke-width="2.5" fill="none"/>
+  <path d="M310 225 L310 272" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <path d="M680 225 L680 272" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <path d="M1050 225 L1050 272" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <text x="1160" y="205" font-size="13.5" font-weight="600" fill="#334155">выборка прогонов</text>
+
+  <!-- ===== ряд 2: три политики назначения запросов ===== -->
+  <rect x="145" y="280" width="330" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="165" y="310" font-size="17" font-weight="600" fill="#0f172a">configured</text>
+  <text x="165" y="337" font-size="13.5" fill="#475569">запрос, заданный человеком</text>
+  <text x="165" y="358" font-size="13.5" fill="#475569">на момент прогона —</text>
+  <text x="165" y="379" font-size="13.5" fill="#475569">базовая линия сравнения</text>
+
+  <rect x="515" y="280" width="330" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="535" y="310" font-size="17" font-weight="600" fill="#0f172a">heuristic · policy.py</text>
+  <text x="535" y="337" font-size="13.5" fill="#475569">перцентиль потребления</text>
+  <text x="535" y="358" font-size="13.5" fill="#475569">задачи с запасом,</text>
+  <text x="535" y="379" font-size="13.5" fill="#475569">округлением и границами</text>
+
+  <rect x="885" y="280" width="330" height="110" rx="9" fill="#fffbeb" stroke="#b45309" stroke-width="2.5"/>
+  <text x="905" y="310" font-size="17" font-weight="600" fill="#7c2d12">model · train.py</text>
+  <text x="905" y="337" font-size="13.5" font-weight="600" fill="#b45309">признаки со сдвигом</text>
+  <text x="905" y="358" font-size="13.5" fill="#7c2d12">квантильная регрессия,</text>
+  <text x="905" y="379" font-size="13.5" fill="#7c2d12">квантиль раздельно по ресурсам</text>
+
+  <!-- ===== схождение политик ===== -->
+  <path d="M310 390 L310 435 L1050 435" stroke="#334155" stroke-width="2.5" fill="none"/>
+  <path d="M680 390 L680 435" stroke="#334155" stroke-width="2.5" fill="none"/>
+  <path d="M1050 390 L1050 435" stroke="#334155" stroke-width="2.5" fill="none"/>
+  <circle cx="310" cy="435" r="5.5" fill="#334155"/>
+  <circle cx="680" cy="435" r="5.5" fill="#334155"/>
+  <circle cx="1050" cy="435" r="5.5" fill="#334155"/>
+  <path d="M485 435 L485 482" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <text x="700" y="464" font-size="13.5" font-weight="600" fill="#b45309">единый интерфейс политики: движок не знает, какая из них применена</text>
+
+  <!-- ===== ряд 3: таблица запросов ===== -->
+  <rect x="310" y="490" width="350" height="80" rx="9" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <text x="330" y="520" font-size="17" font-weight="600" fill="#0f172a">Таблица запросов</text>
+  <text x="330" y="547" font-size="13.5" fill="#475569">(cpu_m, mem_mi) на каждую задачу</text>
+
+  <!-- ===== ряд 4: имитация и оценка ===== -->
+  <rect x="40" y="640" width="240" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="60" y="670" font-size="17" font-weight="600" fill="#0f172a">pools.py</text>
+  <text x="60" y="697" font-size="13.5" fill="#475569">описание пула: узлы,</text>
+  <text x="60" y="718" font-size="13.5" fill="#475569">ёмкость, предел</text>
+  <text x="60" y="739" font-size="13.5" fill="#475569">параллелизма</text>
+
+  <rect x="340" y="640" width="290" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="360" y="670" font-size="17" font-weight="600" fill="#0f172a">scenario.py</text>
+  <text x="360" y="697" font-size="13.5" fill="#475569">поток задач: поступление,</text>
+  <text x="360" y="718" font-size="13.5" fill="#475569">длительность, потребление;</text>
+  <text x="360" y="739" font-size="13.5" fill="#475569">модель числа ядер</text>
+
+  <rect x="690" y="640" width="290" height="110" rx="9" fill="#fffbeb" stroke="#b45309" stroke-width="2.5"/>
+  <text x="710" y="670" font-size="17" font-weight="600" fill="#7c2d12">engine.py</text>
+  <text x="710" y="697" font-size="13.5" font-weight="600" fill="#b45309">резерв — по запросу,</text>
+  <text x="710" y="718" font-size="13.5" font-weight="600" fill="#b45309">потребление — отдельно</text>
+  <text x="710" y="739" font-size="13.5" fill="#7c2d12">дискретно-событийный ход</text>
+
+  <rect x="1040" y="640" width="280" height="110" rx="9" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="1060" y="670" font-size="17" font-weight="600" fill="#0f172a">Показатели</text>
+  <text x="1060" y="697" font-size="13.5" fill="#475569">недооценка по памяти,</text>
+  <text x="1060" y="718" font-size="13.5" fill="#475569">резерв, ожидание,</text>
+  <text x="1060" y="739" font-size="13.5" fill="#475569">утилизация → сравнение</text>
+
+  <path d="M485 570 L485 632" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <path d="M280 695 L332 695" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <path d="M630 695 L682 695" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#d)"/>
+  <path d="M980 695 L1032 695" stroke="#334155" stroke-width="2.5" fill="none" marker-end="url(#dAcc)"/>
+
+  <!-- сноска -->
+  <text x="40" y="812" font-size="13.5" fill="#64748b">Выделенным отмечены три узла, несущие методические решения: дедупликация прогонов и признаки со сдвигом исключают утечку целевой</text>
+  <text x="40" y="834" font-size="13.5" fill="#64748b">переменной, раздельный учёт резерва и потребления делает наблюдаемым переподписание ёмкости. Три политики взаимозаменяемы, поэтому</text>
+  <text x="40" y="856" font-size="13.5" fill="#64748b">базовая линия и обучаемая модель сравниваются одним кодом на одних данных.</text>
+</svg>
