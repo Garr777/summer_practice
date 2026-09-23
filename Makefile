@@ -2,7 +2,7 @@
 # and what a runner would run are the same scripts.
 .PHONY: all lint figures check sources html docx pdf kfu clean serve stages
 
-all:      ## run the full pipeline (lint -> check -> sources -> html -> docx -> pdf)
+all:      ## run every stage: lint, figures, check, sources, html, docx, pdf, kfu
 	@ci/pipeline.sh
 
 lint:     ## structural lint of the catalog
