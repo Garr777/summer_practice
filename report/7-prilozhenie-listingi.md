@@ -145,7 +145,7 @@ def build_features(df):
         df[f"{col}_prior_std"] = s.transform(lambda x: x.shift().expanding().std())
         df[f"{col}_prior_last"] = s.shift()
     df["prior_count"] = grp.cumcount()       # объём истории = мера доверия
-    df["is_builder"] = (df["pool"] == "linux-builder").astype(int)
+    df["is_builder"] = (df["pool"] == BUILDER_POOL).astype(int)
     return df.sort_values("start_ts").reset_index(drop=True)
 ```
 
@@ -329,7 +329,8 @@ def _kpis(jobs, series, nodes, node_cpu_m, node_mem_mi):
 ![Интерфейс имитационной модели пула исполнителей](images/sim-ui.png)
 
 *Рисунок Б.2 — Интерфейс имитационной модели: воспроизведение потока из
-32 903 прогонов пула `linux-tests` при действующей конфигурации*
+392 369 прогонов основного пула тестирования при действующей конфигурации.
+Идентификаторы задач обезличены*
 
 На рисунке представлено состояние модели при параметрах, соответствующих
 эксплуатируемому пулу: 16 узлов по 16 000 миллиядер и 57 344 Ми, предел
